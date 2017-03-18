@@ -5,5 +5,5 @@
 .*.swp
 /.idea/
 *.iml
-/bin/
-/dist/
+/classes/
+*.jar
