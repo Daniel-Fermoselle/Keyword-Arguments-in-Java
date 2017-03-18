@@ -17,18 +17,22 @@
     
     <target name="compile" depends="init" description="compile the source ">
         <!-- Compile the java code from ${src.dir} into ${build.dir} -->
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" />
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}">
+            <classpath>
+                <pathelement path="lib/javassist.jar"/>
+            </classpath>
+        </javac>
     </target>
     
     <target name="jar" depends="compile" description="package, output to JAR">
         
         <!-- Put everything in ${build} into the {$projectName}-${DSTAMP}.jar file -->
         <jar destfile="KeyConstructors.jar" basedir="${build.dir}" >
+            <zipgroupfileset dir="lib" includes="javassist.jar"/>
             <manifest>
                 <!-- create an executable Jar -->
                 <attribute name="Main-Class" value="ist.meic.pa.KeyConstructors" />
             </manifest>
-            <zipgroupfileset dir="lib" includes="javassist.jar"/>
         </jar>
     </target>
     

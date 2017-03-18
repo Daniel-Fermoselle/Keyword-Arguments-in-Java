@@ -3,19 +3,15 @@ import javassist.*;
 
 public class KeyConstructors {
 
-	public void say(){
-		System.out.println("lasnfnasflkn");
-	}
-	
-	public static void main(String[] args) {
+
+	public static void main(String[] args) throws NotFoundException, CannotCompileException, InstantiationException, IllegalAccessException {
 		System.out.println("Hello World");
 		ClassPool cp = ClassPool.getDefault();
-        CtClass cc = cp.get("KeyConstructors");
+        CtClass cc = cp.get("ist.meic.pa.Coco");
         CtMethod m = cc.getDeclaredMethod("say");
-        m.insertBefore("{ System.out.println(\"KeyConstructors.say():\"); }");
+        m.insertBefore("{ System.out.println(\"Coco.say():\"); }");
         Class c = cc.toClass();
-        KeyConstructors h = (KeyConstructors)c.newInstance();
+        Coco h = (Coco)c.newInstance();
         h.say();
-	}
-
+	} 
 }
