@@ -1,1 +1,9 @@
+.DS_Store
+.classpath
+.settings
+.project
+.*.swp
+/.idea/
+*.iml
 /bin/
+/dist/
