@@ -11,8 +11,6 @@
     
     
     <target name="init">
-        <!-- Create the time stamp -->
-        <tstamp />
         <!-- Create the build directory structure used by compile -->
         <mkdir dir="${build.dir}" />
     </target>
@@ -28,8 +26,9 @@
         <jar destfile="KeyConstructors.jar" basedir="${build.dir}" >
             <manifest>
                 <!-- create an executable Jar -->
-                <attribute name="Main-Class" value="ist.meic.pa.KeyConstructors.jar" />
+                <attribute name="Main-Class" value="ist.meic.pa.KeyConstructors" />
             </manifest>
+            <zipgroupfileset dir="lib" includes="javassist.jar"/>
         </jar>
     </target>
     
