@@ -15,7 +15,7 @@ public class KeyConstructors {
 		Class<?> c = Class.forName(args[0]);
 		System.out.println("Hello World");
 		//Constructor<?> m = c.getDeclaredConstructor(Object[].class);
-		Test t = new Test("height",123,"margin",12,"margin",20);
+		Test t = new Test("height",123,"margin",12,"width",20);
 		System.out.println(t.toString());
 		/*if(m.isAnnotationPresent(KeywordArgs.class)){
 			ArrayList<String> fieldNames = new ArrayList<String>();
