@@ -4,6 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import javassist.*;
 
 public class Test {
@@ -40,11 +42,28 @@ public class Test {
 					}
 
 			}
+			//"width", 80, "height", 30
+			HashMap<String, Boolean> keywords = new HashMap<String, Boolean>();
+			for(int i=0; i<args.length;i=i+2){
+				String arg = args[i].toString();
+				if(fieldNames.contains(arg)){
+						if(keywords.get(arg)==null ||keywords.get(arg)==false){
+							keywords.put(arg, true);
+							Field setField = c.getDeclaredField(arg);
+							setField.set(this, new Integer(args[i+1].toString()));//TODO HOW TO GENERATE THAT MUCH POWER
+						}
+						else{
+							throw new RuntimeException("Duplicated keyword: " + arg);
+						}
+				}
+				else{
+					throw new RuntimeException("Unrecognize keyword: " + arg);
+				}
+			}
 		} catch (NoSuchMethodException | SecurityException | NoSuchFieldException | IllegalArgumentException
 				| IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		System.out.println(this.toString());
 	}
 
 	public String toString() {
