@@ -9,14 +9,14 @@ import javassist.*;
 public class KeyConstructors {
 
 	//TODO REMOVE THROWS
-	public static void main(String[] args) throws NotFoundException, 
-	CannotCompileException, InstantiationException, IllegalAccessException, ClassNotFoundException,
-	NoSuchMethodException, SecurityException, NoSuchFieldException {
-		Class<?> c = Class.forName(args[0]);
+	public static void main(String[] args) throws Throwable {
 		System.out.println("Hello World");
+		Translator translator = new KeywordsTranslator();
+        ClassPool pool = ClassPool.getDefault();
+        Loader classLoader = new Loader();
+        classLoader.addTranslator(pool, translator);
+        classLoader.run(args);
 		//Constructor<?> m = c.getDeclaredConstructor(Object[].class);
-		Test t = new Test("height",123,"margin",12,"width",20);
-		System.out.println(t.toString());
 		/*if(m.isAnnotationPresent(KeywordArgs.class)){
 			ArrayList<String> fieldNames = new ArrayList<String>();
 			Field[] fields = c.getDeclaredFields();

@@ -18,7 +18,7 @@ public class Test {
 
 	@KeywordArgs("width=100,height=50,margin")
 	public Test(Object... args) {
-		Constructor<?> m;
+		/*Constructor<?> m;
 		try {
 			Class<?> c = this.getClass();
 			m = c.getConstructor(Object[].class);
@@ -68,7 +68,7 @@ public class Test {
 		} catch (NoSuchMethodException | SecurityException | NoSuchFieldException | IllegalArgumentException
 				| IllegalAccessException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public String toString() {
