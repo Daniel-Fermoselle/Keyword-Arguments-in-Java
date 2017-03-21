@@ -1,5 +1,6 @@
 package ist.meic.pa;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -63,39 +64,39 @@ public class KeywordsTranslator implements Translator{
 				String template = "";
 				for(String s: fieldVerifier.keySet()){//TODO NEED TO INITIALIZE NON PRIMITIVE TYPES
 					if(!fieldVerifier.get(s).equals("")){
-						template = template + "this." + s + " = " + fieldVerifier.get(s) + ";\n";
+						template = template + "this." + s + " = " + fieldVerifier.get(s) + ";";
 					}
 				}
-				template = template + "Constructor<?> m;\n"+
-				"try {\n"+
-				"m = c.getConstructor(Object[].class);\n"+
-				"ArrayList<String> fieldNames = new ArrayList<String>();\n"+
-				"Field[] fields = c.getFields();\n"+
-				"for (Field field : fields) {\n"+
-				"fieldNames.add(field.getName());\n"+
-				"}\n"+
-				"HashMap<String, String> keywords = new HashMap<String, String>();\n"+
-				"for(int i=0; i<$args.length;i=i+2){\n"+
-					"String arg = $args[i].toString();\n"+
-					"if(fieldNames.contains(arg)){\n"+
-							"if(keywords.get(arg)==null ||keywords.get(arg)==false){\n"+
-								"keywords.put(arg, true);\n"+
-								"this.$args[i]=$args[i+1];\n"+
-							"}\n"+
-							"else{\n"+
-								"throw new RuntimeException(\"Duplicated keyword: \" + arg);\n"+
-							"}\n"+
-					"}\n"+
-					"else{\n"+
-						"throw new RuntimeException(\"Unrecognize keyword: \" + arg);\n"+
-					"}\n"+
-				"}\n"+
+				template = template + "Constructor<$class> m;"+
+				"try {"+
+				"m = c.getConstructor(Object[].class);"+
+				"java.util.ArrayList fieldNames = new java.util.ArrayList();"+
+				"Field[] fields = c.getFields();"+
+				"for (Field field : fields) {"+
+				"fieldNames.add(field.getName());"+
+				"}"+
+				"java.util.ArrayList keywords = new java.util.ArrayList();"+
+				"for(int i=0; i<$args.length;i=i+2){"+
+					"String arg = $args[i].toString();"+
+					"if(fieldNames.contains(arg)){"+
+							"if(keywords.contains(arg)){"+
+								"keywords.add(arg);"+
+								"this.$args[i]=$args[i+1];"+
+							"}"+
+							"else{"+
+								"throw new RuntimeException(\"Duplicated keyword: \" + arg);"+
+							"}"+
+					"}"+
+					"else{"+
+						"throw new RuntimeException(\"Unrecognize keyword: \" + arg);"+
+					"}"+
+				"}"+
 				"catch (NoSuchMethodException | SecurityException "
 				+ "| NoSuchFieldException | IllegalArgumentException"
-				+ "| IllegalAccessException e) {\n" + 
-					"e.printStackTrace();\n" + 
-				"}\n";
-				template = "{\n" 
+				+ "| IllegalAccessException e) {" + 
+					"e.printStackTrace();" + 
+				"}";
+				template = "{" 
 				+ template 
 				+ "}";
 		    	ctMethod.setBody(template);
