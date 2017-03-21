@@ -63,39 +63,38 @@ public class KeywordsTranslator implements Translator{
 				String template = "";
 				for(String s: fieldVerifier.keySet()){//TODO NEED TO INITIALIZE NON PRIMITIVE TYPES
 					if(!fieldVerifier.get(s).equals("")){
-						template = template + "this." + s + " = " + fieldVerifier.get(s) + ";\n";
+						template = template + "this." + s + " = " + fieldVerifier.get(s) + ";";
 					}
 				}
-				template = template + "Constructor<?> m;\n"+
-				"try {\n"+
-				"m = c.getConstructor(Object[].class);\n"+
-				"ArrayList<String> fieldNames = new ArrayList<String>();\n"+
-				"Field[] fields = c.getFields();\n"+
-				"for (Field field : fields) {\n"+
-				"fieldNames.add(field.getName());\n"+
-				"}\n"+
-				"HashMap<String, String> keywords = new HashMap<String, String>();\n"+
-				"for(int i=0; i<$args.length;i=i+2){\n"+
-					"String arg = $args[i].toString();\n"+
-					"if(fieldNames.contains(arg)){\n"+
-							"if(keywords.get(arg)==null ||keywords.get(arg)==false){\n"+
-								"keywords.put(arg, true);\n"+
-								"this.$args[i]=$args[i+1];\n"+
-							"}\n"+
-							"else{\n"+
-								"throw new RuntimeException(\"Duplicated keyword: \" + arg);\n"+
-							"}\n"+
-					"}\n"+
-					"else{\n"+
-						"throw new RuntimeException(\"Unrecognize keyword: \" + arg);\n"+
-					"}\n"+
-				"}\n"+
-				"catch (NoSuchMethodException | SecurityException "
-				+ "| NoSuchFieldException | IllegalArgumentException"
-				+ "| IllegalAccessException e) {\n" + 
-					"e.printStackTrace();\n" + 
-				"}\n";
-				template = "{\n" 
+				template = template +
+						"System.out.println(\"After declarations: \");" +
+					"try { "+
+					"java.util.ArrayList fieldNames = new java.util.ArrayList();"+
+					"java.lang.reflect.Field[] fields = $class.getFields();"+
+					"java.lang.reflect.Field field = fields[0];"+
+					/*"for (java.lang.reflect.Field field : fields) {"+
+					"	fieldNames.add(field.getName());"+
+					"	System.out.println(\"Dvfbgrddtfvg: \" + field.getName());"+
+					"}"+
+					"java.util.HashMap keywords = new java.util.HashMap();"+
+					"for (int i = 0; i < $args.length; i = i + 2) {"+
+					"	String arg = $args[i].toString();"+
+					"	if (fieldNames.contains(arg)) {"+
+					"		if (keywords.get(arg) == null || keywords.containsKey(arg) == false) {"+
+					"			keywords.put(arg, true);"+
+					"			$args[i] = $args[i + 1];"+
+					"		} else {"+
+					"			throw new RuntimeException(\"Duplicated keyword: \"+arg);"+
+					"		}"+
+					"	} else {"+
+					"		throw new RuntimeException(\"Unrecognize keyword: \"+arg);"+
+					"	}"+
+					"}"+*/
+				"} catch (java.lang.Exception e) {"+
+				"	e.printStackTrace();"+
+				"	throw new RuntimeException(\"Unexpected error\");"+
+				"}";
+				template = "{" 
 				+ template 
 				+ "}";
 		    	ctMethod.setBody(template);
