@@ -5,7 +5,7 @@ class Widget {
 	int height;
 	int margin;
 
-	@KeywordArgs("width=100,height=50,margin=5")
+	@KeywordArgs("width=100,height=50,margin")
 	public Widget(Object... args) {}
 
 	public String toString() {

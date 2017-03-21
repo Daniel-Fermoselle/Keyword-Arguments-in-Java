@@ -10,7 +10,7 @@ public class KeyConstructors {
 
 	//TODO REMOVE THROWS
 	public static void main(String[] args) throws Throwable {
-		System.out.println("Hello World");
+		//System.out.println("Hello World");
 		Translator translator = new KeywordsTranslator();
         ClassPool pool = ClassPool.getDefault();
         Loader classLoader = new Loader();
