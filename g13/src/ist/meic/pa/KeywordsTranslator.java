@@ -68,12 +68,36 @@ public class KeywordsTranslator implements Translator{
 					}
 				}
 				template = template +
-						"System.out.println(\"After declarations: \");" +
+						"System.out.println(\"After declarations: \");"+
+						"try {"+
+						"	java.util.ArrayList fieldNames = new java.util.ArrayList();"+
+						"	java.lang.reflect.Field[] fields = $class.getDeclaredFields();"+
+						"	for(int i=0; i < fields.length ; i++){"+
+						"		fieldNames.add(fields[i].getName());"+
+						"	}"+
+						"   java.util.ArrayList keywords = new java.util.ArrayList();"+
+						"	for (int i = 0; i < $args.length; i = i + 2) {"+
+						"		String arg = $args[i].toString();"+
+						"		if (fieldNames.contains(arg)) {"+
+						"			if (!keywords.contains(arg)) {"+
+						"				keywords.add(arg);"+
+						"				$args[i] = $args[i + 1];"+
+						"			} else {"+
+						"				throw new RuntimeException(\"Duplicated keyword: \" + arg);"+
+						"			}"+
+						"		} else {"+
+						"			throw new RuntimeException(\"Unrecognize keyword: \" + arg);"+
+						"		}"+
+						"	}"+
+						"} catch (java.lang.Exception e) {"+
+						"	e.printStackTrace();"+
+						"	throw new RuntimeException(\"Unexpected error\");"+
+						"}";
+					/*"System.out.println(\"After declarations: \");" +
 					"try { "+
 					"java.util.ArrayList fieldNames = new java.util.ArrayList();"+
 					"java.lang.reflect.Field[] fields = $class.getFields();"+
-					"java.lang.reflect.Field field = fields[0];"+
-					/*"for (java.lang.reflect.Field field : fields) {"+
+					"for (java.lang.reflect.Field field : fields) {"+
 					"	fieldNames.add(field.getName());"+
 					"	System.out.println(\"Dvfbgrddtfvg: \" + field.getName());"+
 					"}"+
@@ -90,11 +114,11 @@ public class KeywordsTranslator implements Translator{
 					"	} else {"+
 					"		throw new RuntimeException(\"Unrecognize keyword: \"+arg);"+
 					"	}"+
-					"}"+*/
+					"}"+
 				"} catch (java.lang.Exception e) {"+
 				"	e.printStackTrace();"+
 				"	throw new RuntimeException(\"Unexpected error\");"+
-				"}";
+				"}";*/
 				template = "{" 
 				+ template 
 				+ "}";
