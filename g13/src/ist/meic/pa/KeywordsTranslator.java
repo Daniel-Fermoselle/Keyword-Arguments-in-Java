@@ -1,6 +1,7 @@
 package ist.meic.pa;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -31,13 +32,15 @@ public class KeywordsTranslator implements Translator{
 	}
 
 	public static void keywordInjector(CtClass ctClass) throws ClassNotFoundException, CannotCompileException{
-		final String template ="System.out.println(\"HelloWorld!\");";
+		//final String template ="System.out.println(\"HelloWorld!\");";
 		System.out.println("asbjfasnfl ml mçk: " + ctClass.getName());
 		CtField[] fields = ctClass.getFields();
-		ArrayList<String>fieldNames = new ArrayList<String>();
+		//ArrayList<String>fieldNames = new ArrayList<String>();
+		HashMap<String,String>fieldVerifier= new HashMap<String,String>();
 		//HashMap<String, >
 		for (CtField field : fields) {
-			fieldNames.add(field.getName());
+			//fieldNames.add(field.getName());
+			fieldVerifier.put(field.getName(), "");
 		}
 		for (CtConstructor ctMethod : ctClass.getConstructors()) {
 		    Object[] annotations = ctMethod.getAnnotations();
@@ -45,14 +48,15 @@ public class KeywordsTranslator implements Translator{
 		    if (annotation!=null) {
 		    	KeywordArgs ka = (KeywordArgs) annotation;
 		    	String keyword = ka.value();
-		    	/*String[] comaSplit = keyword.split(",");
+		    	String[] comaSplit = keyword.split(",");
 				for (String temp : comaSplit) {
 						String[] equalSplit = temp.split("=");
-						if (fieldNames.contains((String) equalSplit[0])) {
+						if (fieldVerifier.keySet().contains((String) equalSplit[0])) {
 							if(equalSplit.length>1){
-								Field setField = c.getField(equalSplit[0]);
-								setField.setAccessible(true);
-								setField.set(this, new Integer(equalSplit[1]));//TODO HOW TO GENERATE THAT MUCH POWER
+								fieldVerifier.put(equalSplit[0], equalSplit[1]);
+//								Field setField = c.getField(equalSplit[0]);
+//								setField.setAccessible(true);
+//								setField.set(this, new Integer(equalSplit[1]));//TODO HOW TO GENERATE THAT MUCH POWER
 		
 								System.out.println("equalSplit[0]: " + equalSplit[0] + " equalSplit[1]: " + equalSplit[1]);
 							}
@@ -61,8 +65,15 @@ public class KeywordsTranslator implements Translator{
 							throw new RuntimeException("Unrecognize keyword: " + equalSplit[0]);
 						}
 
-				}*/
-		    	ctMethod.setBody("System.out.println(\"" + keyword + "\");");
+				}
+				String template = "";
+				for(String s: fieldVerifier.keySet()){
+					template = template + s + " = " + fieldVerifier.get(s) + ";\n";
+				}
+				template = "{\n" 
+							+ template 
+							+ "}";
+		    	ctMethod.setBody(template);
 		    }
 		}
 	}
