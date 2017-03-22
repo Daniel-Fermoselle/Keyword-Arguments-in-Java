@@ -137,22 +137,22 @@ public class KeywordsTranslator implements Translator {
     public static String getCorrectAssignment(String field, String fieldString){
     	String r = "";
     	if(fieldString.equals("int")){
-    		r= field + "=((Integer)arguments.get(i + 1)).intValue();";
+    		r= field + "=((Number)arguments.get(i + 1)).intValue();";
     	}
     	else if(fieldString.equals("byte")){
-    		r= field + "=((Byte)arguments.get(i + 1)).byteValue();";
+    		r= field + "=((Number)arguments.get(i + 1)).byteValue();";
     	}
     	else if(fieldString.equals("short")){
-    		r= field + "=((Short)arguments.get(i + 1)).shortValue();";
+    		r= field + "=((Number)arguments.get(i + 1)).shortValue();";
     	}
     	else if(fieldString.equals("long")){
-    		r= field + "=((Long)arguments.get(i + 1)).longValue();";
+    		r= field + "=((Number)arguments.get(i + 1)).longValue();";
     	}
     	else if(fieldString.equals("float")){
-    		r= field + "=((Float)arguments.get(i + 1)).floatValue();";
+    		r= field + "=((Number)arguments.get(i + 1)).floatValue();";
     	}
     	else if(fieldString.equals("double")){
-    		r= field + "=((Double)arguments.get(i + 1)).doubleValue();";
+    		r= field + "=((Number)arguments.get(i + 1)).doubleValue();";
     	}
     	else if(fieldString.equals("boolean")){
     		r= field + "=((Boolean)arguments.get(i + 1)).booleanValue();";
