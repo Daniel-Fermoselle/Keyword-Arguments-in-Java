@@ -1,6 +1,5 @@
 package ist.meic.pa;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,11 +8,8 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
-import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.Translator;
-import javassist.expr.ExprEditor;
-import javassist.expr.FieldAccess;
 
 public class KeywordsTranslator implements Translator {
 
@@ -47,6 +43,11 @@ public class KeywordsTranslator implements Translator {
             if (annotation != null) {
                 KeywordArgs ka = (KeywordArgs) annotation;
                 String keyword = ka.value();
+                if(keyword.equals("")){//EMPTY KEYWORD CASE
+                	String template="{}";
+                	ctMethod.setBody(template);
+                	return;
+                }
                 String[] comaSplit = keyword.split(",");
                 for (String temp : comaSplit) {
                     String[] equalSplit = temp.split("=");
