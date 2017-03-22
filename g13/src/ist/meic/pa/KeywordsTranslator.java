@@ -73,7 +73,6 @@ public class KeywordsTranslator implements Translator {
                     }
                 }
                 template = template +
-                        "System.out.println(\"After declarations: \");" +
                         "try {" +
                         "   java.util.ArrayList readKeywords = new java.util.ArrayList();" +
                         "   java.util.List arguments = java.util.Arrays.asList($1);" +
@@ -90,7 +89,7 @@ public class KeywordsTranslator implements Translator {
                 for (String field : keywordFields) {
                     template = template +
                             "       if(\"" + field + "\".equals(arguments.get(i))){" +
-                            "inKeyword = true;" +
+                            "			inKeyword = true;" +
                             "       }";
                 }
                 template = template +
@@ -103,14 +102,11 @@ public class KeywordsTranslator implements Translator {
                 for (String field : keywordFields) {
                     //System.out.println(fie ld);
                     CtField fieldType = ctClass.getDeclaredField(field);
-                    String stringFieldType = fieldType.getClass().getName();
+                    String stringFieldType = fieldType.getType().getName();
                     template = template +
                             "	for (int i = 0; i < arguments.size(); i = i + 2) {" +
-                            "		if (\"" + field + "\".equals(arguments.get(i))) {";
-
-                    //        "			" + field + " = ((Integer)arguments.get(i + 1)).intValue();" +
-
-                    template = template +
+                            "		if (\"" + field + "\".equals(arguments.get(i))) {" + 
+                    		getCorrectAssignment(field, stringFieldType) + 
                                 "		}" +
                             "	}";
                 }
@@ -135,6 +131,40 @@ public class KeywordsTranslator implements Translator {
             }
         }
         return null;
+    }
+    
+    public static String getCorrectAssignment(String field, String fieldString){
+    	String r = "";
+    	if(fieldString.equals("int")){
+    		r= field + "=((Integer)arguments.get(i + 1)).intValue();";
+    	}
+    	else if(fieldString.equals("byte")){
+    		r= field + "=((Byte)arguments.get(i + 1)).byteValue();";
+    	}
+    	else if(fieldString.equals("short")){
+    		r= field + "=((Short)arguments.get(i + 1)).shortValue();";
+    	}
+    	else if(fieldString.equals("long")){
+    		r= field + "=((Long)arguments.get(i + 1)).longValue();";
+    	}
+    	else if(fieldString.equals("float")){
+    		r= field + "=((Float)arguments.get(i + 1)).floatValue();";
+    	}
+    	else if(fieldString.equals("double")){
+    		r= field + "=((Double)arguments.get(i + 1)).doubleValue();";
+    	}
+    	else if(fieldString.equals("boolean")){
+    		r= field + "=((Boolean)arguments.get(i + 1)).booleanValue();";
+    	}
+    	else if(fieldString.equals("char")){
+    		r= field + "=((Character)arguments.get(i + 1)).charValue();";
+    	}
+    	else{
+    		r= field + "= arguments.get(i + 1);";
+    	}
+    	
+    	
+    	return r;
     }
 
 }
