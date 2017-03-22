@@ -71,10 +71,35 @@ public class KeywordsTranslator implements Translator {
                 template = template +
                         "System.out.println(\"After declarations: \");" +
                         "try {" +
-                        "   java.util.ArrayList keywords = new java.util.ArrayList();"+
+                        "   java.util.ArrayList readKeywords = new java.util.ArrayList();"+
                         "   java.util.List arguments = java.util.Arrays.asList($1);"+
-              //          "   java.util.ArrayList keywordFields = "+ keywordFields +";"+
-                		"	boolean isRepeated = false;";
+                		"	boolean inKeyword = false;";
+
+                template = template +
+                        "	for (int i = 0; i < arguments.size(); i = i + 2) {"+
+                        "       inKeyword = false;"+
+                        "       if(!readKeywords.contains(arguments.get(i))){"+
+                        "           readKeywords.add(arguments.get(i))"+
+                        "       }"+
+                        "       else {"+
+                        "           throw new RuntimeException(\"Duplicated Keyword: \" + arguments.get(i));"+
+                        "       }";
+                for (String field : keywordFields) {
+                    template = template +
+                        "       if(\"" + field + "\".equals(arguments.get(i))){"+
+                                    "inKeyword = true;"+
+                        "       }";
+                }
+                template = template +
+                        "       if(!inKeyword){"+
+                        "           throw new RuntimeException(\"Unrecognized Keyword: \" + arguments.get(i));"+
+                        "       }"+
+                        "   }";
+
+
+
+
+
 
                 for (String field : keywordFields) {
                     System.out.println(field);
