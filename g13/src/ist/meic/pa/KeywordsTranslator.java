@@ -160,7 +160,7 @@ public class KeywordsTranslator implements Translator {
     		r= field + "=((Character)arguments.get(i + 1)).charValue();";
     	}
     	else{
-    		r= field + "= arguments.get(i + 1);";
+    		r= field + "= (" + fieldString + ")arguments.get(i + 1);";
     	}
     	
     	
