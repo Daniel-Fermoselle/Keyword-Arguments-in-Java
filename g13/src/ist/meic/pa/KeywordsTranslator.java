@@ -109,7 +109,7 @@ public class KeywordsTranslator implements Translator {
                             "		if (\"" + field + "\".equals(arguments.get(i))) {" +
                             "			if (!keywords.contains(\"" + field + "\")) {" +
                             "				keywords.add(\"" + field + "\");" +
-                      //      "				" + field + " =  arguments.get(i + 1);" +
+                            "				" + field + " = ((Integer)arguments.get(i + 1)).intValue();" +
                             "			}"+
                             "		}" +
                             "	}";
