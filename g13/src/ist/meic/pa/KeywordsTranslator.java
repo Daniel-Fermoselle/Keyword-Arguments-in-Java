@@ -73,17 +73,16 @@ public class KeywordsTranslator implements Translator {
                         "try {" +
                         "   java.util.ArrayList readKeywords = new java.util.ArrayList();"+
                         "   java.util.List arguments = java.util.Arrays.asList($1);"+
-                		"	boolean inKeyword = false;";
-
-                template = template +
+                		"	boolean inKeyword = false;"+
                         "	for (int i = 0; i < arguments.size(); i = i + 2) {"+
                         "       inKeyword = false;"+
                         "       if(!readKeywords.contains(arguments.get(i))){"+
-                        "           readKeywords.add(arguments.get(i))"+
+                        "           readKeywords.add(arguments.get(i));"+
                         "       }"+
                         "       else {"+
                         "           throw new RuntimeException(\"Duplicated Keyword: \" + arguments.get(i));"+
                         "       }";
+
                 for (String field : keywordFields) {
                     template = template +
                         "       if(\"" + field + "\".equals(arguments.get(i))){"+
@@ -97,20 +96,13 @@ public class KeywordsTranslator implements Translator {
                         "   }";
 
 
-
-
-
-
                 for (String field : keywordFields) {
                     System.out.println(field);
                     template = template +
-                    		"	System.out.println(arguments.toString());" +
                             "	for (int i = 0; i < arguments.size(); i = i + 2) {" +
                             "		if (\"" + field + "\".equals(arguments.get(i))) {" +
-                            "			if (!keywords.contains(\"" + field + "\")) {" +
-                            "				keywords.add(\"" + field + "\");" +
-                            "				" + field + " = ((Integer)arguments.get(i + 1)).intValue();" +
-                            "			}"+
+                            "			" + field + " = ((Integer)arguments.get(i + 1)).intValue();" +
+                    		"	        System.out.println(((Integer)arguments.get(i + 1)).intValue() + \" field -> \" + \"" + field + "\");" +
                             "		}" +
                             "	}";
                 }
