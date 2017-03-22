@@ -33,7 +33,7 @@ public class KeywordsTranslator implements Translator {
     }
 
     //TODO REMOVE THROWS
-    public static void keywordInjector(CtClass ctClass) throws ClassNotFoundException, CannotCompileException {
+    public static void keywordInjector(CtClass ctClass) throws ClassNotFoundException, CannotCompileException, NotFoundException {
 
         CtField[] fields = ctClass.getFields();
         HashMap<String, String> fieldVerifier = new HashMap<String, String>();
@@ -51,10 +51,9 @@ public class KeywordsTranslator implements Translator {
                 for (String temp : comaSplit) {
                     String[] equalSplit = temp.split("=");
                     if (fieldVerifier.keySet().contains((String) equalSplit[0])) {
-                        if(!keywordFields.contains(equalSplit[0])) {
+                        if (!keywordFields.contains(equalSplit[0])) {
                             keywordFields.add(equalSplit[0]);
-                        }
-                        else{
+                        } else {
                             throw new RuntimeException("Duplicated Keyword in annotation: " + equalSplit[0]);
                         }
                         if (equalSplit.length > 1) {
@@ -62,7 +61,7 @@ public class KeywordsTranslator implements Translator {
                             //System.out.println("equalSplit[0]: " + equalSplit[0] + " equalSplit[1]: " + equalSplit[1]);
                         }
                     } else {
-                        throw new RuntimeException("Unrecognize keyword: " + equalSplit[0]);//TODO INJECT EXCEPTION
+                        throw new RuntimeException("Unrecognize keyword: " + equalSplit[0]);
                     }
 
                 }
@@ -76,39 +75,43 @@ public class KeywordsTranslator implements Translator {
                 template = template +
                         "System.out.println(\"After declarations: \");" +
                         "try {" +
-                        "   java.util.ArrayList readKeywords = new java.util.ArrayList();"+
-                        "   java.util.List arguments = java.util.Arrays.asList($1);"+
-                		"	boolean inKeyword = false;"+
-                        "	for (int i = 0; i < arguments.size(); i = i + 2) {"+
-                        "       inKeyword = false;"+
-                        "       if(!readKeywords.contains(arguments.get(i))){"+
-                        "           readKeywords.add(arguments.get(i));"+
-                        "       }"+
-                        "       else {"+
-                        "           throw new RuntimeException(\"Duplicated Keyword in constructor args: \" + arguments.get(i));"+
+                        "   java.util.ArrayList readKeywords = new java.util.ArrayList();" +
+                        "   java.util.List arguments = java.util.Arrays.asList($1);" +
+                        "	boolean inKeyword = false;" +
+                        "	for (int i = 0; i < arguments.size(); i = i + 2) {" +
+                        "       inKeyword = false;" +
+                        "       if(!readKeywords.contains(arguments.get(i))){" +
+                        "           readKeywords.add(arguments.get(i));" +
+                        "       }" +
+                        "       else {" +
+                        "           throw new RuntimeException(\"Duplicated Keyword in constructor args: \" + arguments.get(i));" +
                         "       }";
 
                 for (String field : keywordFields) {
                     template = template +
-                        "       if(\"" + field + "\".equals(arguments.get(i))){"+
-                                    "inKeyword = true;"+
-                        "       }";
+                            "       if(\"" + field + "\".equals(arguments.get(i))){" +
+                            "inKeyword = true;" +
+                            "       }";
                 }
                 template = template +
-                        "       if(!inKeyword){"+
-                        "           throw new RuntimeException(\"Unrecognized Keyword: \" + arguments.get(i));"+
-                        "       }"+
+                        "       if(!inKeyword){" +
+                        "           throw new RuntimeException(\"Unrecognized Keyword: \" + arguments.get(i));" +
+                        "       }" +
                         "   }";
 
 
                 for (String field : keywordFields) {
-                    System.out.println(field);
+                    //System.out.println(fie ld);
+                    CtField fieldType = ctClass.getDeclaredField(field);
+                    String stringFieldType = fieldType.getClass().getName();
                     template = template +
                             "	for (int i = 0; i < arguments.size(); i = i + 2) {" +
-                            "		if (\"" + field + "\".equals(arguments.get(i))) {" +
-                            "			" + field + " = ((Integer)arguments.get(i + 1)).intValue();" +
-                    		"	        System.out.println(((Integer)arguments.get(i + 1)).intValue() + \" field -> \" + \"" + field + "\");" +
-                            "		}" +
+                            "		if (\"" + field + "\".equals(arguments.get(i))) {";
+
+                    //        "			" + field + " = ((Integer)arguments.get(i + 1)).intValue();" +
+
+                    template = template +
+                                "		}" +
                             "	}";
                 }
                 template = template +
@@ -116,10 +119,10 @@ public class KeywordsTranslator implements Translator {
                         "	e.printStackTrace();" +
                         "	throw new RuntimeException(\"Unexpected error\");" +
                         "}";
+
                 template = "{"
                         + template
                         + "}";
-                //System.out.println(template);
                 ctMethod.setBody(template);
             }
         }
