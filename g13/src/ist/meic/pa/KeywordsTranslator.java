@@ -51,7 +51,12 @@ public class KeywordsTranslator implements Translator {
                 for (String temp : comaSplit) {
                     String[] equalSplit = temp.split("=");
                     if (fieldVerifier.keySet().contains((String) equalSplit[0])) {
-                        keywordFields.add(equalSplit[0]);
+                        if(!keywordFields.contains(equalSplit[0])) {
+                            keywordFields.add(equalSplit[0]);
+                        }
+                        else{
+                            throw new RuntimeException("Duplicated Keyword in annotation: " + equalSplit[0]);
+                        }
                         if (equalSplit.length > 1) {
                             fieldVerifier.put(equalSplit[0], equalSplit[1]);
                             //System.out.println("equalSplit[0]: " + equalSplit[0] + " equalSplit[1]: " + equalSplit[1]);
@@ -80,7 +85,7 @@ public class KeywordsTranslator implements Translator {
                         "           readKeywords.add(arguments.get(i));"+
                         "       }"+
                         "       else {"+
-                        "           throw new RuntimeException(\"Duplicated Keyword: \" + arguments.get(i));"+
+                        "           throw new RuntimeException(\"Duplicated Keyword in constructor args: \" + arguments.get(i));"+
                         "       }";
 
                 for (String field : keywordFields) {
