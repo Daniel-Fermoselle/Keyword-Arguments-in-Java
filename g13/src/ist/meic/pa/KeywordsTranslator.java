@@ -37,6 +37,7 @@ public class KeywordsTranslator implements Translator {
 
         CtField[] fields = ctClass.getFields();
         HashMap<String, String> fieldVerifier = new HashMap<String, String>();
+        ArrayList<String> keywordFields = new ArrayList<String>();
         for (CtField field : fields) {
             fieldVerifier.put(field.getName(), "");
         }
@@ -50,6 +51,7 @@ public class KeywordsTranslator implements Translator {
                 for (String temp : comaSplit) {
                     String[] equalSplit = temp.split("=");
                     if (fieldVerifier.keySet().contains((String) equalSplit[0])) {
+                        keywordFields.add(equalSplit[0]);
                         if (equalSplit.length > 1) {
                             fieldVerifier.put(equalSplit[0], equalSplit[1]);
                             //System.out.println("equalSplit[0]: " + equalSplit[0] + " equalSplit[1]: " + equalSplit[1]);
@@ -61,7 +63,7 @@ public class KeywordsTranslator implements Translator {
                 }
                 //TO INJECT
                 String template = "";
-                for (String s : fieldVerifier.keySet()) {//TODO NEED TO INITIALIZE NON PRIMITIVE TYPES
+                for (String s : keywordFields) {//TODO NEED TO INITIALIZE NON PRIMITIVE TYPES
                     if (!fieldVerifier.get(s).equals("")) {
                         template = template + "this." + s + " = " + fieldVerifier.get(s) + ";";
                     }
@@ -69,21 +71,21 @@ public class KeywordsTranslator implements Translator {
                 template = template +
                         "System.out.println(\"After declarations: \");" +
                         "try {" +
-                        "   java.util.ArrayList keywords = new java.util.ArrayList();";
+                        "   java.util.ArrayList keywords = new java.util.ArrayList();"+
+                        "   java.util.List arguments = java.util.Arrays.asList($1);"+
+              //          "   java.util.ArrayList keywordFields = "+ keywordFields +";"+
+                		"	boolean isRepeated = false;";
 
-                for (String field : fieldVerifier.keySet()) {
+                for (String field : keywordFields) {
                     System.out.println(field);
                     template = template +
-                            "	for (int i = 0; i < $args.length; i = i + 2) {" +
-                            "		if (\"" + field + "\".equals($args[i])) {" +
+                    		"	System.out.println(arguments.toString());" +
+                            "	for (int i = 0; i < arguments.size(); i = i + 2) {" +
+                            "		if (\"" + field + "\".equals(arguments.get(i))) {" +
                             "			if (!keywords.contains(\"" + field + "\")) {" +
                             "				keywords.add(\"" + field + "\");" +
-//                            "				" + field + " = ($w) $args[i + 1];" +
-                            "			} else {" +
-                            "				throw new RuntimeException(\"Duplicated keyword: \" + \"" + field + "\");" +
-                            "			}" +
-                            "		} else {" +
-                            "			throw new RuntimeException(\"Unrecognize keyword: \" + \"" + field + "\");" +
+                      //      "				" + field + " =  arguments.get(i + 1);" +
+                            "			}"+
                             "		}" +
                             "	}";
                 }
@@ -95,7 +97,7 @@ public class KeywordsTranslator implements Translator {
                 template = "{"
                         + template
                         + "}";
-                System.out.println(template);
+                //System.out.println(template);
                 ctMethod.setBody(template);
             }
         }
