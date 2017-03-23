@@ -1,5 +1,6 @@
 package ist.meic.pa;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
+import javassist.CtNewConstructor;
 import javassist.NotFoundException;
 import javassist.Translator;
 
@@ -25,18 +27,22 @@ public class KeywordsTranslator implements Translator {
         CtClass ctClass = pool.get(className);
         try {
             keywordInjector(ctClass);
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Error loading class: " + className);
         }
     }
 
     //TODO REMOVE THROWS
-    public static void keywordInjector(CtClass ctClass) throws ClassNotFoundException, CannotCompileException, NotFoundException {
+    public static void keywordInjector(CtClass ctClass) throws ClassNotFoundException, CannotCompileException, NotFoundException, IOException {
 
-        CtField[] fields = getAllFieldsInHierarchy(ctClass);
+    	CtClass superctClass = ctClass.getSuperclass();
+    	if(superctClass!=null && !superctClass.getName().equals("java.lang.Object")){
+    		superctClass.addConstructor(CtNewConstructor.defaultConstructor(superctClass));
+    	}    	
+
+    	CtField[] fields = getAllFieldsInHierarchy(ctClass);
         ArrayList<String> fieldVerifier = new ArrayList<String>();
-
         ArrayList<String> keywordFields = new ArrayList<String>();
         HashMap<String, String> keywordAssignments;
 
@@ -121,8 +127,7 @@ public class KeywordsTranslator implements Translator {
                 }
                 template = template +
                         "} catch (java.lang.Exception e) {" +
-                        "	e.printStackTrace();" +
-                        "	throw new RuntimeException(\"Unexpected error\");" +
+                        "	throw new RuntimeException(e.getMessage());" +
                         "}";
 
                 template = "{"
