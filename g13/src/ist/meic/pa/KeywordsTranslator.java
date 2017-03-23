@@ -43,7 +43,7 @@ public class KeywordsTranslator implements Translator {
         }
         if(!b)
             ctClass.addConstructor(CtNewConstructor.defaultConstructor(ctClass));
-
+        
     	CtField[] fields = getAllFieldsInHierarchy(ctClass);
         ArrayList<String> fieldVerifier = new ArrayList<String>();
         ArrayList<String> keywordFields = new ArrayList<String>();
