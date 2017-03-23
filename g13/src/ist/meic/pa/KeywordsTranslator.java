@@ -36,10 +36,13 @@ public class KeywordsTranslator implements Translator {
     //TODO REMOVE THROWS
     public static void keywordInjector(CtClass ctClass) throws ClassNotFoundException, CannotCompileException, NotFoundException, IOException {
 
-    	CtClass superctClass = ctClass.getSuperclass();
-    	if(superctClass!=null && !superctClass.getName().equals("java.lang.Object")){
-    		superctClass.addConstructor(CtNewConstructor.defaultConstructor(superctClass));
-    	}    	
+    	boolean b = false;
+    	for(CtConstructor cons : ctClass.getDeclaredConstructors()) {
+            if (cons.getSignature().equals("()V"))
+                b=true;
+        }
+        if(!b)
+            ctClass.addConstructor(CtNewConstructor.defaultConstructor(ctClass));
 
     	CtField[] fields = getAllFieldsInHierarchy(ctClass);
         ArrayList<String> fieldVerifier = new ArrayList<String>();
