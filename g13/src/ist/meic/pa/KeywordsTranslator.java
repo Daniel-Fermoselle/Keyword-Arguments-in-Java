@@ -46,6 +46,7 @@ public class KeywordsTranslator implements Translator {
             if (annotation != null) {
                 KeywordArgs ka = (KeywordArgs) annotation;
                 String keyword = getAllKeywordArgs(ctClass);
+                //System.out.println("snflksaf: " + keyword);
                 keywordAssignments = getMap(keyword);
                 if(keyword.equals("")){//EMPTY KEYWORD CASE
                 	String template="{}";
@@ -53,7 +54,7 @@ public class KeywordsTranslator implements Translator {
                 	return;
                 }
                 for (String tempKeywordIc : keywordAssignments.keySet()) {
-                	System.out.println("keyword: " + tempKeywordIc + " : " + keywordAssignments.get(tempKeywordIc));
+                	//System.out.println("keyword: " + tempKeywordIc + " : " + keywordAssignments.get(tempKeywordIc));
                     if (fieldVerifier.contains(tempKeywordIc)) {
                         keywordFields.add(tempKeywordIc);
                     } else {
@@ -99,6 +100,7 @@ public class KeywordsTranslator implements Translator {
                     //System.out.println(fie ld);
                     CtField fieldType = getSpecificFields(fields,field);
                     String stringFieldType = fieldType.getType().getName();
+                    //System.out.println("Field name: " + fieldType.getName() + " type name: " + stringFieldType);
                     template = template +
                             "	for (int i = 0; i < arguments.size(); i = i + 2) {" +
                             "		if (\"" + field + "\".equals(arguments.get(i))) {" + 
@@ -219,11 +221,13 @@ public class KeywordsTranslator implements Translator {
 		String[] coma = keyword.split(",");
 		for(String s : coma){
 			String[] equal = s.split("=");
-			if((!map.containsKey(equal[0]) || map.get(equal[0]).equals("")) && equal.length>1){
+			if(!map.containsKey(equal[0]) || (map.get(equal[0]).equals("") && equal.length>1)){
+				if(equal.length>1){
 					map.put(equal[0], equal[1]);
-			}
-			else{
-				map.put(equal[0], "");
+				}
+				else{
+					map.put(equal[0], "");
+				}
 			}
 		}
 		return map;
