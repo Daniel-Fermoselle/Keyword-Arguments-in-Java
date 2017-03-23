@@ -38,9 +38,13 @@ public class KeywordsTranslator implements Translator {
 
     	CtClass superctClass = ctClass.getSuperclass();
     	if(superctClass!=null && !superctClass.getName().equals("java.lang.Object")){
+    		if(superctClass.isFrozen()){
+    			superctClass.defrost();
+    		}
+    		System.out.println("Adding constructor to class " + superctClass.getName());
     		superctClass.addConstructor(CtNewConstructor.defaultConstructor(superctClass));
     	}    	
-
+    	
     	CtField[] fields = getAllFieldsInHierarchy(ctClass);
         ArrayList<String> fieldVerifier = new ArrayList<String>();
         ArrayList<String> keywordFields = new ArrayList<String>();
