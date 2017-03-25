@@ -41,9 +41,10 @@ public class KeywordsTranslator implements Translator {
             if (cons.getSignature().equals("()V"))
                 b=true;
         }
-        if(!b)
+        if(!b) {
             ctClass.addConstructor(CtNewConstructor.defaultConstructor(ctClass));
-        
+        }
+
     	CtField[] fields = getAllFieldsInHierarchy(ctClass);
         ArrayList<String> fieldVerifier = new ArrayList<String>();
         ArrayList<String> keywordFields = new ArrayList<String>();
@@ -222,7 +223,10 @@ public class KeywordsTranslator implements Translator {
                     //Recursion
                     if (objectClass.getSuperclass() != null) {
                         CtClass superClass = objectClass.getSuperclass();
-                        keyword += "," + getAllKeywordArgs(superClass);
+                        String allKeyWords = getAllKeywordArgs(superClass);
+                        if(!allKeyWords.equals("")) {
+                            keyword += "," + getAllKeywordArgs(superClass);
+                        }
                     }
                 }
             }
@@ -238,10 +242,10 @@ public class KeywordsTranslator implements Translator {
     public static HashMap<String, String> getMap(String keyword) {
         HashMap<String, String> map = new HashMap<String, String>();
 
-        String[] coma = keyword.split(",");
+        String[] coma = keyword.split("(?<=[A-Za-z0-9)\"]),(?=[A-Za-z0-9]+(=[A-Za-z0-9(\"]+|,|$))");
 
         for (String s : coma) {
-            String[] equal = s.split("=");
+            String[] equal = s.split("(?<=[A-Za-z0-9])=(?=([A-Za-z0-9]+$|\".*\"$|[A-Za-z0-9]+[(].*[)]$|$))");
 
             if (!map.containsKey(equal[0]) || (map.get(equal[0]).equals("") && equal.length > 1)) {
                 if (equal.length > 1) {
@@ -250,6 +254,10 @@ public class KeywordsTranslator implements Translator {
                     map.put(equal[0], "");
                 }
             }
+        }
+
+        for (String pog : map.keySet()){
+            System.out.println("Key: "+ pog + " value: "+map.get(pog));
         }
 
         return map;
