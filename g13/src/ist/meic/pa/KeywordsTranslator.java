@@ -3,9 +3,9 @@ package ist.meic.pa;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -23,45 +23,39 @@ public class KeywordsTranslator implements Translator {
     }
 
     @Override
-    public void onLoad(ClassPool pool, String className) throws NotFoundException, CannotCompileException {
-        CtClass ctClass = pool.get(className);
-        try {
+    public void onLoad(ClassPool pool, String className) {
+    	try {
+    		CtClass ctClass = pool.get(className);
             keywordInjector(ctClass);
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (ClassNotFoundException | IOException | NotFoundException | CannotCompileException e) {
             e.printStackTrace();
             throw new RuntimeException("Error loading class: " + className);
         }
     }
 
-    //TODO REMOVE THROWS
     public static void keywordInjector(CtClass ctClass) throws ClassNotFoundException, CannotCompileException, NotFoundException, IOException {
 
-    	boolean b = false;
-    	for(CtConstructor cons : ctClass.getDeclaredConstructors()) {
-            if (cons.getSignature().equals("()V"))
-                b=true;
-        }
-        if(!b) {
-            ctClass.addConstructor(CtNewConstructor.defaultConstructor(ctClass));
-        }
+    	//Create default constructor for this class
+    	addDefaultConstructor(ctClass);
 
+    	//Initialize variables
+    	TreeMap<String, String> keywordAssignments;
     	CtField[] fields = getAllFieldsInHierarchy(ctClass);
         ArrayList<String> fieldVerifier = new ArrayList<String>();
         ArrayList<String> keywordFields = new ArrayList<String>();
-        HashMap<String, String> keywordAssignments;
 
-        //TODO Can be removed and instead of using fieldVerifier we use fields with getName()
+        //Add fields names to ArrayList
         for (CtField field : fields) {
             fieldVerifier.add(field.getName());
         }
 
-        for (CtConstructor ctMethod : ctClass.getDeclaredConstructors()) {//TODO REVIEW BECAUSE OF getAllKeywordArgs
+        for (CtConstructor ctMethod : ctClass.getDeclaredConstructors()) {
             Object[] annotations = ctMethod.getAnnotations();
             Object annotation = getCorrectAnnotation(annotations);
 
             if (annotation != null) {
 
-                //Get all keywords and put them in a map
+                //Get all keywords and put them in a map from superclasses
                 String keywordsInString = getAllKeywordArgs(ctClass);
                 keywordAssignments = getMap(keywordsInString);
 
@@ -108,26 +102,25 @@ public class KeywordsTranslator implements Translator {
                         "       }";
                 for (String field : keywordFields) {
                     template = template +
-                            "       if(\"" + field + "\".equals(arguments.get(i))){" +
-                            "			inKeyword = true;" +
-                            "       }";
+                        "       if(\"" + field + "\".equals(arguments.get(i))){" +
+                        "			inKeyword = true;" +
+                        "       }";
                 }
                 template = template +
                         "       if(!inKeyword){" +
                         "           throw new RuntimeException(\"Unrecognized Keyword: \" + arguments.get(i));" +
                         "       }" +
                         "   }";
-
                 //For loop to assign values in arguments to the keywords
                 for (String field : keywordFields) {
                     CtField fieldType = getSpecificFields(fields, field);
                     String stringFieldType = fieldType.getType().getName();
                     template = template +
-                            "	for (int i = 0; i < arguments.size(); i = i + 2) {" +
-                            "		if (\"" + field + "\".equals(arguments.get(i))) {" +
-                            getCorrectAssignment(field, stringFieldType) +
-                            "		}" +
-                            "	}";
+                        "	for (int i = 0; i < arguments.size(); i = i + 2) {" +
+                        "		if (\"" + field + "\".equals(arguments.get(i))) {" +
+                        			getCorrectAssignment(field, stringFieldType) +
+                        "		}" +
+                        "	}";
                 }
                 template = template +
                         "} catch (java.lang.Exception e) {" +
@@ -138,43 +131,29 @@ public class KeywordsTranslator implements Translator {
                         + template
                         + "}";
                 ctMethod.setBody(template);
+                break;
             }
+        }
+    }
+    
+    public static void addDefaultConstructor(CtClass ctClass) throws CannotCompileException{
+    	boolean b = false;
+    	for(CtConstructor cons : ctClass.getDeclaredConstructors()) {
+            if (cons.getSignature().equals("()V"))
+                b=true;
+        }
+        if(!b) {
+            ctClass.addConstructor(CtNewConstructor.defaultConstructor(ctClass));
         }
     }
 
     public static Object getCorrectAnnotation(Object[] args) {
-
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] instanceof KeywordArgs) {
-                return args[i];
+        for (Object annotation : args) {
+            if (annotation instanceof KeywordArgs) {
+                return annotation;
             }
         }
         return null;
-    }
-
-    public static String getCorrectAssignment(String field, String fieldString) {
-        String r = "";
-        if (fieldString.equals("int")) {
-            r = field + "=((Number)arguments.get(i + 1)).intValue();";
-        } else if (fieldString.equals("byte")) {
-            r = field + "=((Number)arguments.get(i + 1)).byteValue();";
-        } else if (fieldString.equals("short")) {
-            r = field + "=((Number)arguments.get(i + 1)).shortValue();";
-        } else if (fieldString.equals("long")) {
-            r = field + "=((Number)arguments.get(i + 1)).longValue();";
-        } else if (fieldString.equals("float")) {
-            r = field + "=((Number)arguments.get(i + 1)).floatValue();";
-        } else if (fieldString.equals("double")) {
-            r = field + "=((Number)arguments.get(i + 1)).doubleValue();";
-        } else if (fieldString.equals("boolean")) {
-            r = field + "=((Boolean)arguments.get(i + 1)).booleanValue();";
-        } else if (fieldString.equals("char")) {
-            r = field + "=((Character)arguments.get(i + 1)).charValue();";
-        } else {
-            r = field + "= (" + fieldString + ")arguments.get(i + 1);";
-        }
-
-        return r;
     }
 
     public static CtField[] getAllFieldsInHierarchy(CtClass objectClass) {//TODO MAYBE DOESNT NEED TO BE INJECTED
@@ -237,27 +216,6 @@ public class KeywordsTranslator implements Translator {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    //a=10,b
-    public static HashMap<String, String> getMap(String keyword) {
-        HashMap<String, String> map = new HashMap<String, String>();
-
-        String[] coma = splitComma(keyword);
-
-        for (String s : coma) {
-            String[] equal = splitEqual(s);
-
-            if (!map.containsKey(equal[0]) || (map.get(equal[0]).equals("") && equal.length > 1)) {
-                if (equal.length > 1) {
-                    map.put(equal[0], equal[1]);
-                } else {
-                    map.put(equal[0], "");
-                }
-            }
-        }
-
-        return map;
-    }
     
     public static String[] splitComma(String keyword){
         String otherThan = " [^)}\"({] ";
@@ -291,6 +249,51 @@ public class KeywordsTranslator implements Translator {
                                       ")                         ", // stop positive look ahead
                                       otherThanQuote, quotedString, otherThanQuote);
         return keyword.split(regex);
+    }    
+
+    public static TreeMap<String, String> getMap(String keyword) {
+        TreeMap<String, String> map = new TreeMap<String, String>();
+
+        String[] coma = splitComma(keyword);
+
+        for (String s : coma) {
+            String[] equal = splitEqual(s);
+
+            if (!map.containsKey(equal[0]) || (map.get(equal[0]).equals("") && equal.length > 1)) {
+                if (equal.length > 1) {
+                    map.put(equal[0], equal[1]);
+                } else {
+                    map.put(equal[0], "");
+                }
+            }
+        }
+
+        return map;
+    }
+    
+    public static String getCorrectAssignment(String field, String fieldString) {
+        String r = "";
+        if (fieldString.equals("int")) {
+            r = "this." + field + "=((Number)arguments.get(i + 1)).intValue();";
+        } else if (fieldString.equals("byte")) {
+            r = "this." + field + "=((Number)arguments.get(i + 1)).byteValue();";
+        } else if (fieldString.equals("short")) {
+            r = "this." + field + "=((Number)arguments.get(i + 1)).shortValue();";
+        } else if (fieldString.equals("long")) {
+            r = "this." + field + "=((Number)arguments.get(i + 1)).longValue();";
+        } else if (fieldString.equals("float")) {
+            r = "this." + field + "=((Number)arguments.get(i + 1)).floatValue();";
+        } else if (fieldString.equals("double")) {
+            r = "this." + field + "=((Number)arguments.get(i + 1)).doubleValue();";
+        } else if (fieldString.equals("boolean")) {
+            r = "this." + field + "=((Boolean)arguments.get(i + 1)).booleanValue();";
+        } else if (fieldString.equals("char")) {
+            r = "this." + field + "=((Character)arguments.get(i + 1)).charValue();";
+        } else {
+            r = "this." + field + "= (" + fieldString + ")arguments.get(i + 1);";
+        }
+
+        return r;
     }
 
 }
