@@ -108,7 +108,7 @@ public class KeywordsTranslator implements Translator {
                 }
                 template = template +
                         "       if(!inKeyword){" +
-                        "           throw new RuntimeException(\"Unrecognized Keyword: \" + arguments.get(i));" +
+                        "           throw new RuntimeException(\"Unrecognized keyword: \" + arguments.get(i));" +
                         "       }" +
                         "   }";
                 //For loop to assign values in arguments to the keywords
