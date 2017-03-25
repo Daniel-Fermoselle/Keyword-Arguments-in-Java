@@ -242,10 +242,10 @@ public class KeywordsTranslator implements Translator {
     public static HashMap<String, String> getMap(String keyword) {
         HashMap<String, String> map = new HashMap<String, String>();
 
-        String[] coma = keyword.split("(?<=[A-Za-z0-9)\"]),(?=[A-Za-z0-9]+(=[A-Za-z0-9(\"]+|,|$))");
+        String[] coma = keyword.split("(?<=[A-Za-z0-9)\"]),(?=[A-Za-z0-9]+(=[A-Za-z0-9(\"{]+|,|$))");
 
         for (String s : coma) {
-            String[] equal = s.split("(?<=[A-Za-z0-9])=(?=([A-Za-z0-9]+$|\".*\"$|[A-Za-z0-9]+[(].*[)]$|$))");
+            String[] equal = s.split("(?<=[A-Za-z0-9])=(?=([-A-Za-z0-9+*]+$|\".*\"$|[{].*[}]|[A-Za-z0-9.]+[(].*[)]$|$))");
 
             if (!map.containsKey(equal[0]) || (map.get(equal[0]).equals("") && equal.length > 1)) {
                 if (equal.length > 1) {
