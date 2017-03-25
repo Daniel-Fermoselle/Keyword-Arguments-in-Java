@@ -80,7 +80,7 @@ public class KeywordsTranslator implements Translator {
                 String template = "";
 
                 //Default values of the Keywords Fields
-                for (String s : keywordAssignments.keySet()) {//TODO NEED TO INITIALIZE NON PRIMITIVE TYPES
+                for (String s : keywordAssignments.keySet()) {
                     if (!keywordAssignments.get(s).equals("")) {
                         template = template + "this." + s + " = " + keywordAssignments.get(s) + ";";
                     }
