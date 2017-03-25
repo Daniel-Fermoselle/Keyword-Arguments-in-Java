@@ -198,7 +198,7 @@ public class KeywordsTranslator implements Translator {
         }
     }
 
-    public static CtField getSpecificFields(CtField[] cf, String n) {//TODO MAYBE DOESNT NEED TO BE INJECTED
+    public static CtField getSpecificFields(CtField[] cf, String n) {
         for (CtField f : cf) {
             if (f.getName().equals(n)) {
                 return f;
@@ -207,7 +207,7 @@ public class KeywordsTranslator implements Translator {
         throw new RuntimeException("No such field named: " + n);
     }
 
-    public static String getAllKeywordArgs(CtClass objectClass) {// TODO MAYBE DOESNT NEED TO BE INJECTED
+    public static String getAllKeywordArgs(CtClass objectClass) {
         try {
             String keyword = "";
 
@@ -242,10 +242,10 @@ public class KeywordsTranslator implements Translator {
     public static HashMap<String, String> getMap(String keyword) {
         HashMap<String, String> map = new HashMap<String, String>();
 
-        String[] coma = keyword.split("(?<=[A-Za-z0-9)\"]),(?=[A-Za-z0-9]+(=[A-Za-z0-9(\"{]+|,|$))");
+        String[] coma = splitComma(keyword);
 
         for (String s : coma) {
-            String[] equal = s.split("(?<=[A-Za-z0-9])=(?=([-A-Za-z0-9+*]+$|\".*\"$|[{].*[}]|[A-Za-z0-9.]+[(].*[)]$|$))");
+            String[] equal = splitEqual(s);
 
             if (!map.containsKey(equal[0]) || (map.get(equal[0]).equals("") && equal.length > 1)) {
                 if (equal.length > 1) {
@@ -256,11 +256,41 @@ public class KeywordsTranslator implements Translator {
             }
         }
 
-        for (String pog : map.keySet()){
-            System.out.println("Key: "+ pog + " value: "+map.get(pog));
-        }
-
         return map;
+    }
+    
+    public static String[] splitComma(String keyword){
+        String otherThan = " [^)}\"({] ";
+        String ignoredString = String.format(" [(|\"|{] %s* [)|\"|}]", otherThan);
+        String regex = String.format("(?x) "+ // enable comments, ignore white spaces
+                                     ",                         "+ // match a comma
+                                     "(?=                       "+ // start positive look ahead
+                                     "  (?:                     "+ //   start non-capturing group 1
+                                     "    %s*                   "+ //     match 'otherThanQuote' zero or more times
+                                     "    %s                    "+ //     match 'ignoredString'
+                                     "  )*                      "+ //   end group 1 and repeat it zero or more times
+                                     "  %s*                     "+ //   match 'otherThanQuote'
+                                     "  $                       "+ // match the end of the string
+                                     ")                         ", // stop positive look ahead
+                                     otherThan, ignoredString, otherThan);
+        return keyword.split(regex);
+    }
+    
+    public static String[] splitEqual(String keyword){
+        String otherThanQuote = " [^\"] ";
+        String quotedString = String.format(" \" %s* \" ", otherThanQuote);
+        String regex = String.format("(?x) "+ // enable comments, ignore white spaces
+                                      "=                         "+ // match a comma
+                                      "(?=                       "+ // start positive look ahead
+                                      "  (?:                     "+ //   start non-capturing group 1
+                                      "    %s*                   "+ //     match 'otherThanQuote' zero or more times
+                                      "    %s                    "+ //     match 'quotedString'
+                                      "  )*                      "+ //   end group 1 and repeat it zero or more times
+                                      "  %s*                     "+ //   match 'otherThanQuote'
+                                      "  $                       "+ // match the end of the string
+                                      ")                         ", // stop positive look ahead
+                                      otherThanQuote, quotedString, otherThanQuote);
+        return keyword.split(regex);
     }
 
 }
