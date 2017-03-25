@@ -156,7 +156,7 @@ public class KeywordsTranslator implements Translator {
         return null;
     }
 
-    public static CtField[] getAllFieldsInHierarchy(CtClass objectClass) {//TODO MAYBE DOESNT NEED TO BE INJECTED
+    public static CtField[] getAllFieldsInHierarchy(CtClass objectClass) {
         try {
             Set<CtField> allFields = new HashSet<>();
             CtField[] declaredFields = objectClass.getDeclaredFields();

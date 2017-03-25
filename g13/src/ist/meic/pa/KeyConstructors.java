@@ -4,7 +4,6 @@ import javassist.*;
 
 public class KeyConstructors {
 
-	//TODO REMOVE THROWS
 	public static void main(String[] args) throws Throwable {
 		Translator translator = new KeywordsTranslator();
         ClassPool pool = ClassPool.getDefault();

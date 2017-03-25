@@ -1,17 +1,17 @@
 ant
 echo "------TestA--------"
-java -jar KeyConstructors.jar TestA
+java -jar keyConstructors.jar TestA
 echo "------TestB--------"
-java -jar KeyConstructors.jar TestB
+java -jar keyConstructors.jar TestB
 echo "------TestC--------"
-java -jar KeyConstructors.jar TestC
+java -jar keyConstructors.jar TestC
 echo "------TestD--------"
-java -jar KeyConstructors.jar TestD
+java -jar keyConstructors.jar TestD
 echo "------TestE--------"
-java -jar KeyConstructors.jar TestE
+java -jar keyConstructors.jar TestE
 echo "------TestF--------"
-java -jar KeyConstructors.jar TestF
+java -jar keyConstructors.jar TestF
 echo "------TestG--------"
-java -jar KeyConstructors.jar TestG
+java -jar keyConstructors.jar TestG
 echo "------TestH--------"
-java -jar KeyConstructors.jar TestH
+java -jar keyConstructors.jar TestH
